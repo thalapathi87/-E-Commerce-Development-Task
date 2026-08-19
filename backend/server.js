@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
-const connectDB = require("./config/db");
+const { connectDB } = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -18,8 +18,10 @@ const {
 
 dotenv.config();
 
-// Connect MongoDB
-connectDB();
+// Connect MongoDB (non-fatal for serverless import)
+connectDB().catch((error) => {
+    console.error("Server startup DB connection error:", error.message);
+});
 
 const app = express();
 
