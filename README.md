@@ -690,7 +690,7 @@ Then open the local Vite URL displayed in the terminal.
 
 ### GitHub Repository
 
-`<YOUR_GITHUB_REPOSITORY_URL>https://github.com/thalapathi87/-E-Commerce-Development-Task`
+`<https://github.com/thalapathi87/-E-Commerce-Development-Task>`
 
 Before submission, verify that:
 
@@ -720,8 +720,8 @@ Password: <USER_TEST_PASSWORD>
 ### Admin
 
 ```text
-Email: <ADMIN_TEST_EMAIL>
-Password: <ADMIN_TEST_PASSWORD>
+ adminEmail = "admin@example.com";
+adminPassword = "admin123";
 ```
 
 > Replace these placeholders with the actual test credentials before submitting the repository.
