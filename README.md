@@ -690,7 +690,7 @@ Then open the local Vite URL displayed in the terminal.
 
 ### GitHub Repository
 
-`<YOUR_GITHUB_REPOSITORY_URL>`
+`<YOUR_GITHUB_REPOSITORY_URL>https://github.com/thalapathi87/-E-Commerce-Development-Task`
 
 Before submission, verify that:
 
