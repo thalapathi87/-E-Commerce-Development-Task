@@ -23,8 +23,34 @@ connectDB();
 
 const app = express();
 
+// CORS Configuration
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || process.env.NODE_ENV === "development") {
+            return callback(null, true);
+        }
+
+        const allowedOrigins = [
+            process.env.FRONTEND_URL,
+            "https://*.vercel.app",
+            "https://*.vercel.sh"
+        ].filter(Boolean);
+
+        if (allowedOrigins.some((allowed) => origin.match(allowed))) {
+            return callback(null, true);
+        }
+
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400
+};
+
+app.use(cors(corsOptions));
+
 // Global Middleware
-app.use(cors());
 app.use(express.json());
 
 // Root Route
