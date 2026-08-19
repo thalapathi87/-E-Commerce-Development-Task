@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Truck,
   CheckCircle2,
+  ArrowRight
 } from "lucide-react";
 import api from "../services/api";
 import Loading from "../components/Loading";
@@ -39,7 +40,7 @@ function ProductDetails() {
         setProduct(data);
       } catch (err) {
         setError(
-          err.response?.data?.message || "Failed to load product"
+          err.response?.data?.message || "Failed to load product details"
         );
       } finally {
         setLoading(false);
@@ -79,33 +80,33 @@ function ProductDetails() {
     triggerAddToCartAnimation(product, productImageRef.current);
 
     setAdding(false);
-    setSuccess("Product added to cart successfully.");
+    setSuccess("Added to your cart elegantly.");
   };
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-        <Loading message="Loading product details..." />
+      <main className="flex min-h-[80vh] items-center justify-center bg-slate-50/50 px-4">
+        <Loading message="Loading timepiece details..." />
       </main>
     );
   }
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-16">
-        <div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600">
-            <span className="text-3xl font-bold">!</span>
+      <main className="flex min-h-[80vh] items-center justify-center bg-slate-50/50 px-4 py-16">
+        <div className="w-full max-w-md rounded-3xl border border-red-100 bg-white p-8 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
+            <span className="text-3xl font-black">!</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Product Unavailable
           </h1>
-          <p className="mt-2 text-sm text-slate-500">{error}</p>
+          <p className="mt-2 text-sm font-medium text-slate-500">{error}</p>
           <Link
             to="/products"
-            className="mt-8 inline-block w-full rounded-xl bg-slate-900 px-5 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="mt-8 inline-block w-full rounded-2xl bg-slate-900 px-5 py-4 text-center text-sm font-bold text-white shadow-md transition-all hover:bg-slate-800 active:scale-[0.98]"
           >
-            Back to Products
+            Back to Collection
           </Link>
         </div>
       </main>
@@ -114,15 +115,15 @@ function ProductDetails() {
 
   if (!product) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-16">
+      <main className="flex min-h-[80vh] items-center justify-center bg-slate-50/50 px-4 py-16">
         <div className="text-center">
-          <Clock className="mx-auto mb-4 h-16 w-16 text-slate-300" strokeWidth={1.5} />
-          <h1 className="text-2xl font-bold text-slate-900">
-            Product not found
+          <Clock className="mx-auto mb-5 h-16 w-16 text-slate-300" strokeWidth={1.5} />
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Timepiece not found
           </h1>
           <Link
             to="/products"
-            className="mt-4 inline-block text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition-colors hover:text-slate-900"
           >
             &larr; Back to Products
           </Link>
@@ -142,159 +143,170 @@ function ProductDetails() {
       : product.category;
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-16 pt-8">
+    <main className="min-h-screen bg-slate-50/50 pb-20 pt-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center text-sm text-slate-500">
-          <Link to="/" className="transition hover:text-blue-600">Home</Link>
-          <ChevronRight className="mx-2 h-4 w-4 text-slate-400" />
-          <Link to="/products" className="transition hover:text-blue-600">
-            {category || "Products"}
+        
+        {/* Premium Breadcrumb */}
+        <nav className="mb-8 flex items-center text-sm font-medium text-slate-400">
+          <Link to="/" className="transition-colors hover:text-slate-900">Home</Link>
+          <ChevronRight className="mx-2.5 h-4 w-4 shrink-0 text-slate-300" strokeWidth={2.5} />
+          <Link to="/products" className="transition-colors hover:text-slate-900">
+            {category || "Collection"}
           </Link>
-          <ChevronRight className="mx-2 h-4 w-4 text-slate-400" />
+          <ChevronRight className="mx-2.5 h-4 w-4 shrink-0 text-slate-300" strokeWidth={2.5} />
           <span className="truncate text-slate-900">{product.name}</span>
         </nav>
 
         {/* Product Details Section */}
-        <section className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-          <div className="grid gap-0 lg:grid-cols-2">
+        <section className="overflow-hidden rounded-3xl bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-slate-100">
+          <div className="grid lg:grid-cols-2">
+            
             {/* Image Gallery Side */}
-            <div className="group relative flex min-h-[300px] items-center justify-center bg-slate-50 p-6 sm:min-h-[400px] lg:min-h-[600px] lg:border-r lg:border-slate-200">
+            <div className="group relative flex min-h-[350px] items-center justify-center bg-slate-50/80 p-8 sm:min-h-[450px] lg:min-h-[650px]">
                {product.image && !imgError ? (
                 <img
                   ref={productImageRef}
                   src={product.image}
                   alt={product.name}
                   onError={() => setImgError(true)}
-                  className="max-h-[400px] w-full object-contain transition-transform duration-700 ease-in-out group-hover:scale-105 sm:max-h-[500px]"
+                  className="max-h-[350px] w-full object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-110 sm:max-h-[450px] lg:max-h-[550px]"
                 />
               ) : (
-                <div className="flex flex-col items-center text-slate-400">
-                  <Clock className="mb-4 h-16 w-16 opacity-30" strokeWidth={1.5} />
-                  <span className="text-sm">No Image Available</span>
+                <div className="flex flex-col items-center text-slate-300">
+                  <Clock className="mb-4 h-20 w-20 opacity-40" strokeWidth={1} />
+                  <span className="text-sm font-medium">No Image Available</span>
                 </div>
               )}
             </div>
 
             {/* Content Side */}
-            <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
+            <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-12">
+              
               {category && (
-                <span className="mb-4 w-fit rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium uppercase tracking-wider text-blue-700">
+                <span className="mb-5 w-fit rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">
                   {category}
                 </span>
               )}
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl lg:leading-[1.1]">
                 {product.name}
               </h1>
 
-              {/* Price */}
-              <div className="relative mt-6 inline-flex w-fit items-end gap-3 rounded-xl bg-slate-900 px-5 py-3 sm:px-6 sm:py-4">
-                <p className="text-2xl sm:text-3xl font-bold text-blue-400">
+              {/* Price Area */}
+              <div className="mt-6 flex items-end gap-3 sm:mt-8">
+                <p className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
                   {formatCurrency(price)}
                 </p>
-                <p className="mb-0.5 text-sm sm:text-base text-slate-400 line-through">
+                <p className="mb-1 text-base font-semibold text-slate-400 line-through decoration-slate-300 sm:mb-1.5 sm:text-lg">
                   {formatCurrency(price * 1.25)}
                 </p>
+                <span className="mb-1.5 ml-2 rounded bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700 sm:mb-2">
+                  20% OFF
+                </span>
               </div>
 
               {product.description && (
-                <p className="mt-6 text-sm leading-relaxed text-slate-600 sm:text-base">
+                <p className="mt-6 text-sm leading-relaxed text-slate-500 sm:text-base">
                   {product.description}
                 </p>
               )}
 
-              {/* Trust badges */}
-              <div className="mt-8 grid grid-cols-2 gap-3 border-y border-slate-200 py-6 sm:gap-4">
-                <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900">
-                    <ShieldCheck className="h-5 w-5" />
+              {/* Trust Badges */}
+              <div className="mt-10 grid grid-cols-2 gap-4 border-y border-slate-100 py-6">
+                <div className="flex items-center gap-3.5 text-sm font-bold text-slate-700">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-900 ring-1 ring-slate-100">
+                    <ShieldCheck className="h-5 w-5" strokeWidth={2.5} />
                   </div>
-                  1 Year Warranty
+                  <span>1 Year<br/><span className="text-slate-400 font-medium">Warranty</span></span>
                 </div>
-                <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900">
-                    <Truck className="h-5 w-5" />
+                <div className="flex items-center gap-3.5 text-sm font-bold text-slate-700">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-900 ring-1 ring-slate-100">
+                    <Truck className="h-5 w-5" strokeWidth={2.5} />
                   </div>
-                  Secure Delivery
+                  <span>Secure<br/><span className="text-slate-400 font-medium">Delivery</span></span>
                 </div>
               </div>
 
               {/* Stock Status */}
-              <div className="mt-6 flex items-center gap-2">
-                <div className={`h-2.5 w-2.5 rounded-full ${isOutOfStock ? "bg-red-500" : "bg-emerald-600 animate-pulse"}`} />
-                <span className={`text-xs font-semibold uppercase tracking-wider ${isOutOfStock ? "text-red-600" : "text-emerald-700"}`}>
+              <div className="mt-8 flex items-center gap-2.5">
+                <div className={`h-2.5 w-2.5 rounded-full ${isOutOfStock ? "bg-red-500" : "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse"}`} />
+                <span className={`text-xs font-bold uppercase tracking-widest ${isOutOfStock ? "text-red-600" : "text-emerald-600"}`}>
                   {isOutOfStock ? "Currently Out of Stock" : `In Stock — ${stock} available`}
                 </span>
               </div>
 
               {!isOutOfStock && (
                 <>
-                  {/* Quantity */}
-                  <div className="mt-6">
-                    <label htmlFor="quantity" className="mb-3 block text-sm font-semibold text-slate-900">
-                      Quantity
-                    </label>
-                    <div className="flex h-12 w-32 items-center overflow-hidden rounded-xl border border-slate-300 bg-white">
-                      <button
-                        type="button"
-                        onClick={() => handleQuantityChange(quantity - 1)}
-                        className="flex h-full w-10 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                      >
-                        &minus;
-                      </button>
-                      <input
-                        id="quantity"
-                        type="number"
-                        min="1"
-                        max={stock}
-                        value={quantity}
-                        onChange={(e) => handleQuantityChange(e.target.value)}
-                        className="h-full w-12 border-x border-slate-200 text-center font-semibold text-slate-900 outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleQuantityChange(quantity + 1)}
-                        className="flex h-full w-10 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                      >
-                        +
-                      </button>
+                  <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
+                    {/* Quantity */}
+                    <div>
+                      <label htmlFor="quantity" className="mb-3 block text-sm font-bold text-slate-900">
+                        Quantity
+                      </label>
+                      <div className="flex h-12 w-36 items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(quantity - 1)}
+                          className="flex h-full w-10 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                        >
+                          &minus;
+                        </button>
+                        <input
+                          id="quantity"
+                          type="number"
+                          min="1"
+                          max={stock}
+                          value={quantity}
+                          onChange={(e) => handleQuantityChange(e.target.value)}
+                          className="h-full w-full bg-transparent text-center font-bold text-slate-900 outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(quantity + 1)}
+                          className="flex h-full w-10 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Total Price */}
-                  <div className="mt-8 flex items-center justify-between rounded-xl bg-slate-50 p-4 sm:p-5 ring-1 ring-slate-200">
-                    <span className="text-sm font-semibold text-slate-600">Total Price</span>
-                    <span className="text-xl sm:text-2xl font-bold text-slate-900">
-                      {formatCurrency(totalPrice)}
-                    </span>
+                    {/* Total Price (Only show if quantity > 1) */}
+                    {quantity > 1 && (
+                      <div className="flex flex-col">
+                        <span className="mb-2 text-sm font-bold text-slate-400">Total</span>
+                        <span className="text-2xl font-black text-slate-900">
+                          {formatCurrency(totalPrice)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Success Alert */}
                   {success && (
-                    <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-200">
+                    <div className="mt-6 flex animate-[fadeIn_0.3s_ease-out] items-center gap-3 rounded-2xl bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200">
                       <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                       {success}
                     </div>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <button
                       type="button"
                       onClick={handleAddToCart}
                       disabled={adding}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-[0.98] disabled:pointer-events-none disabled:bg-slate-300"
+                      className="group flex h-14 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-slate-900 px-8 text-sm font-bold text-white shadow-[0_8px_20px_rgb(0,0,0,0.08)] transition-all hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] active:scale-[0.98] disabled:pointer-events-none disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
                     >
-                      <ShoppingCart className="h-5 w-5" />
-                      {adding ? "Adding to Cart..." : "Add to Cart"}
+                      <ShoppingCart className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" strokeWidth={2.5} />
+                      <span>{adding ? "Adding..." : "Add to Cart"}</span>
                     </button>
 
                     <Link
                       to="/cart"
-                      className="flex flex-1 items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98]"
+                      className="group flex h-14 flex-1 items-center justify-center gap-2.5 rounded-2xl bg-slate-50 px-8 text-sm font-bold text-slate-900 transition-colors hover:bg-slate-100 active:scale-[0.98]"
                     >
-                      Go to Cart
+                      <span>Go to Cart</span>
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={2.5} />
                     </Link>
                   </div>
                 </>
@@ -303,9 +315,9 @@ function ProductDetails() {
               {isOutOfStock && (
                 <Link
                   to="/products"
-                  className="mt-8 flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  className="mt-10 flex h-14 w-full items-center justify-center rounded-2xl border-2 border-slate-100 bg-white px-8 text-sm font-bold text-slate-600 transition-colors hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98]"
                 >
-                  Explore Other Products
+                  Explore Other Masterpieces
                 </Link>
               )}
             </div>

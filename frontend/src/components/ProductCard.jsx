@@ -1,6 +1,6 @@
 import { memo, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Eye, Clock } from "lucide-react";
+import { ShoppingBag, Eye, Clock, CheckCircle2 } from "lucide-react";
 import useCart from "../hooks/useCart";
 import { useAddToCartAnimation } from "./AddToCartAnimation";
 import formatCurrency from "../utils/formatCurrency";
@@ -26,23 +26,25 @@ const ProductCard = memo(({ product }) => {
   };
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl focus-within:ring-2 focus-within:ring-blue-600">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] transition-all duration-500 hover:-translate-y-1.5 hover:border-slate-200 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] focus-within:ring-2 focus-within:ring-slate-900">
       
-      {/* Smart Badges */}
-      {isOutOfStock ? (
-        <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-700 shadow-sm">
-          Sold Out
-        </span>
-      ) : isLowStock ? (
-        <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 shadow-sm">
-          Only {stockCount} Left
-        </span>
-      ) : null}
+      {/* Top Floating Badges (Glassmorphism effect) */}
+      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+        {isOutOfStock ? (
+          <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-red-600 shadow-sm">
+            Sold Out
+          </span>
+        ) : isLowStock ? (
+          <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-orange-600 shadow-sm">
+            Only {stockCount} Left
+          </span>
+        ) : null}
+      </div>
 
-      {/* Product Image */}
+      {/* Product Image Section */}
       <Link
         to={`/products/${_id}`}
-        className="relative block aspect-square w-full overflow-hidden bg-slate-50"
+        className="relative block aspect-[4/3] w-full overflow-hidden bg-slate-50/50 p-4"
         aria-label={`View details for ${name}`}
       >
         {image && !imgError ? (
@@ -52,55 +54,63 @@ const ProductCard = memo(({ product }) => {
             alt={name}
             loading="lazy"
             onError={() => setImgError(true)}
-            className="h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            className="h-full w-full object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-110"
           />
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-slate-300">
-            <Clock className="mb-1 h-8 w-8 opacity-50" strokeWidth={1.5} />
-            <span className="text-[10px] font-medium text-slate-400">Image Unavailable</span>
+            <Clock className="mb-2 h-10 w-10 opacity-40" strokeWidth={1.5} />
+            <span className="text-xs font-medium text-slate-400">No Image</span>
           </div>
         )}
         
-        <div className="absolute inset-0 bg-slate-900/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {/* Subtle overlay on hover */}
+        <div className="absolute inset-0 bg-slate-900/0 transition-colors duration-500 group-hover:bg-slate-900/[0.02]" />
       </Link>
 
-      {/* Product Content */}
-      <div className="flex flex-1 flex-col p-4">
+      {/* Product Details Section */}
+      <div className="flex flex-1 flex-col p-5">
+        
         <Link to={`/products/${_id}`} className="inline-block outline-none">
-          <h2 className="line-clamp-1 text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-600">
+          <h2 className="line-clamp-1 text-lg font-bold text-slate-900 transition-colors group-hover:text-slate-700">
             {name}
           </h2>
         </Link>
 
         {description && (
-          <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+          <p className="mt-1.5 line-clamp-2 text-sm text-slate-500 leading-relaxed">
             {description}
           </p>
         )}
 
-        {/* Price & Status */}
-        <div className="mb-3 mt-auto flex items-end justify-between pt-3">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-medium text-slate-400 line-through">
-              {formatCurrency(Number(price) * 1.25)}
-            </span>
-            <span className="text-lg font-extrabold text-slate-900">
+        {/* Pricing & Stock Status */}
+        <div className="mb-5 mt-auto flex items-end justify-between pt-4">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-400 line-through decoration-slate-300">
+                {formatCurrency(Number(price) * 1.25)}
+              </span>
+              <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-700">
+                20% OFF
+              </span>
+            </div>
+            <span className="text-xl font-black tracking-tight text-slate-900">
               {formatCurrency(price)}
             </span>
           </div>
           
           {!isOutOfStock && !isLowStock && (
-             <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">
-               In Stock
-             </span>
+             <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 mb-1">
+               <CheckCircle2 className="h-3.5 w-3.5" />
+               <span>In Stock</span>
+             </div>
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
           <Link
             to={`/products/${_id}`}
-            className="flex items-center justify-center rounded-xl bg-slate-100 p-3 text-slate-600 transition-all hover:bg-slate-200 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-50 border border-slate-100 text-slate-600 transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 hover:border-slate-200 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
             aria-label="View Details"
             title="View Details"
           >
@@ -111,10 +121,10 @@ const ProductCard = memo(({ product }) => {
             type="button"
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-1"
+            className="group/btn flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white shadow-md shadow-slate-900/10 transition-all duration-300 hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 active:scale-[0.98] disabled:pointer-events-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
           >
-            <ShoppingBag className="h-4 w-4" />
-            {isOutOfStock ? "Unavailable" : "Add to Cart"}
+            <ShoppingBag className="h-4 w-4 transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
+            <span>{isOutOfStock ? "Sold Out" : "Add to Cart"}</span>
           </button>
         </div>
       </div>
