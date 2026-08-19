@@ -128,6 +128,11 @@ const getProducts = async (req, res) => {
         });
 
     } catch (error) {
+        console.error("getProducts error:", {
+            message: error.message,
+            name: error.name,
+            stack: error.stack
+        });
         return errorResponse(res, 500, error.message);
     }
 };
