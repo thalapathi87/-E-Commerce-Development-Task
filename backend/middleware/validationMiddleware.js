@@ -6,7 +6,8 @@ const validate = (schema, options = {}) => {
 
         const { error } = schema.validate(dataToValidate, {
             abortEarly: false,
-            allowUnknown: source === "query"
+            allowUnknown: source === "query",
+            convert: source === "query"
         });
 
         if (error) {

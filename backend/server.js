@@ -61,6 +61,14 @@ app.get("/", (req, res) => {
     });
 });
 
+// Health Check
+app.get("/api/health", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "Backend API is running"
+    });
+});
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
@@ -73,24 +81,29 @@ app.use("/api/admin", adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Server
-const PORT = process.env.PORT || 5000;
+// Only start server when running directly (local development)
+// Vercel will import the app instead
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-// Graceful shutdown handlers
-process.on("unhandledRejection", (err, reason) => {
-    console.error("Unhandled Rejection:", err);
-    server.close(() => {
-        process.exit(1);
+    const server = app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
     });
-});
 
-process.on("uncaughtException", (err) => {
-    console.error("Uncaught Exception:", err);
-    server.close(() => {
-        process.exit(1);
+    // Graceful shutdown handlers
+    process.on("unhandledRejection", (err, reason) => {
+        console.error("Unhandled Rejection:", err);
+        server.close(() => {
+            process.exit(1);
+        });
     });
-});
+
+    process.on("uncaughtException", (err) => {
+        console.error("Uncaught Exception:", err);
+        server.close(() => {
+            process.exit(1);
+        });
+    });
+}
+
+module.exports = app;
