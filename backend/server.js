@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
-const { connectDB } = require("./config/db");
+const { getConnectionState, getConnectionPromise } = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -17,11 +17,6 @@ const {
 } = require("./middleware/errorMiddleware");
 
 dotenv.config();
-
-// Connect MongoDB (non-fatal for serverless import)
-connectDB().catch((error) => {
-    console.error("Server startup DB connection error:", error.message);
-});
 
 const app = express();
 
@@ -54,6 +49,28 @@ app.use(cors(corsOptions));
 
 // Global Middleware
 app.use(express.json());
+
+const dbCheck = async (req, res, next) => {
+    if (req.path === "/health") {
+        return next();
+    }
+
+    if (getConnectionState() === 1) {
+        return next();
+    }
+
+    try {
+        await getConnectionPromise();
+        return next();
+    } catch (error) {
+        return res.status(503).json({
+            success: false,
+            message: "Database connection unavailable. Please try again later."
+        });
+    }
+};
+
+app.use("/api/", dbCheck);
 
 // Root Route
 app.get("/", (req, res) => {
