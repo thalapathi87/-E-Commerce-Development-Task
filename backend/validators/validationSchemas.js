@@ -125,7 +125,14 @@ const orderSchema = Joi.object({
 
     paymentMethod: Joi.string()
         .valid("COD", "MOCK_PAYMENT")
-        .default("COD")
+        .default("COD"),
+
+    items: Joi.array().items(
+        Joi.object({
+            productId: Joi.string().required(),
+            quantity: Joi.number().integer().min(1).required()
+        })
+    ).optional()
 });
 
 const productQuerySchema = Joi.object({

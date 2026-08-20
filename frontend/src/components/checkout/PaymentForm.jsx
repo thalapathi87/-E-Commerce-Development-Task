@@ -22,7 +22,7 @@ const PAYMENT_OPTIONS = [
   },
 ];
 
-function PaymentForm({ onSuccess, onBack }) {
+function PaymentForm({ onSuccess, onBack, items, total }) {
   const { address, setPaymentMethod, paymentMethod, setCreatedOrder } =
     useCheckout();
 
@@ -31,7 +31,11 @@ function PaymentForm({ onSuccess, onBack }) {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [error, setError] = useState("");
 
-  const subtotal = cartTotal;
+  const isBuyNow = items && items.length > 0;
+  const orderItems = isBuyNow ? items : cart;
+  const orderTotal = isBuyNow ? (total || items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0)) : cartTotal;
+
+  const subtotal = orderTotal;
   const shipping = 0;
   const grandTotal = subtotal + shipping;
 
@@ -47,8 +51,8 @@ function PaymentForm({ onSuccess, onBack }) {
       return;
     }
 
-    if (cart.length === 0) {
-      setError("Your cart is empty.");
+    if (orderItems.length === 0) {
+      setError(isBuyNow ? "No product selected for purchase." : "Your cart is empty.");
       return;
     }
 
@@ -69,6 +73,13 @@ function PaymentForm({ onSuccess, onBack }) {
         paymentMethod: paymentMethod || "COD",
       };
 
+      if (isBuyNow) {
+        orderData.items = orderItems.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity || 1,
+        }));
+      }
+
       const response = await api.post("/orders", orderData);
 
       const createdOrder =
@@ -76,7 +87,9 @@ function PaymentForm({ onSuccess, onBack }) {
 
       setCreatedOrder(createdOrder);
 
-      clearCart();
+      if (!isBuyNow) {
+        clearCart();
+      }
 
       onSuccess(createdOrder);
     } catch (err) {
@@ -196,10 +209,11 @@ function PaymentForm({ onSuccess, onBack }) {
       </aside>
 
       <OrderSummary
-        cart={cart}
+        cart={orderItems}
         subtotal={subtotal}
         shipping={shipping}
         grandTotal={grandTotal}
+        isBuyNow={isBuyNow}
       />
     </div>
   );

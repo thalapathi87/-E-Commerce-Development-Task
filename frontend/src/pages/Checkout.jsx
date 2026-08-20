@@ -1,24 +1,41 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import useCart from "../hooks/useCart";
 import formatCurrency from "../utils/formatCurrency";
-import { CheckoutProvider, useCheckout } from "../context/CheckoutContext";
+import { CheckoutProvider, useCheckout as useCheckoutContext } from "../context/CheckoutContext";
 import CheckoutStepIndicator from "../components/checkout/CheckoutStepIndicator";
 import AddressForm from "../components/checkout/AddressForm";
 import PaymentForm from "../components/checkout/PaymentForm";
 import OrderSuccess from "../components/checkout/OrderSuccess";
 import EmptyState from "../components/EmptyState";
 import Loading from "../components/Loading";
+import { Minus, Plus } from "lucide-react";
 
 function CheckoutContent() {
   const [step, setStep] = useState(1);
+  const [buyNowQuantity, setBuyNowQuantity] = useState(1);
 
+  const location = useLocation();
   const { cart, cartTotal, syncing } = useCart();
-  const { clearCheckoutData, createdOrder } = useCheckout();
+  const { clearCheckoutData, createdOrder, buyNowProduct, setBuyNowProduct } = useCheckoutContext();
 
   const navigate = useNavigate();
 
-  const subtotal = cartTotal;
+  useEffect(() => {
+    if (location.state?.buyNowProduct) {
+      setBuyNowProduct(location.state.buyNowProduct);
+    }
+  }, [location.state, setBuyNowProduct]);
+
+  const isBuyNow = Boolean(buyNowProduct);
+  const buyNowQty = Math.max(1, Math.min(buyNowQuantity, Number(buyNowProduct?.stock || 1)));
+  const buyNowTotal = Number(buyNowProduct?.price || 0) * buyNowQty;
+
+  const checkoutItems = isBuyNow
+    ? [{ ...buyNowProduct, quantity: buyNowQty }]
+    : cart;
+
+  const subtotal = isBuyNow ? buyNowTotal : cartTotal;
   const shipping = 0;
   const grandTotal = subtotal + shipping;
 
@@ -32,12 +49,14 @@ function CheckoutContent() {
 
   const handleContinueShopping = () => {
     clearCheckoutData();
+    setBuyNowProduct(null);
+    setBuyNowQuantity(1);
     navigate("/products");
   };
 
   // Step 1: Address
   if (step === 1) {
-    if (syncing && cart.length === 0) {
+    if (syncing && cart.length === 0 && !isBuyNow) {
       return (
         <main className="flex min-h-screen items-center justify-center bg-slate-50">
           <Loading message="Syncing your cart..." />
@@ -45,7 +64,7 @@ function CheckoutContent() {
       );
     }
 
-    if (cart.length === 0) {
+    if (cart.length === 0 && !isBuyNow) {
       return (
         <main className="min-h-screen bg-slate-50">
           <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center px-4">
@@ -96,7 +115,7 @@ function CheckoutContent() {
                 </h3>
 
                 <div className="mt-6 space-y-3 text-sm text-slate-600">
-                  {cart.map((item) => (
+                  {checkoutItems.map((item) => (
                     <div
                       key={item._id}
                       className="flex items-baseline justify-between gap-3"
@@ -115,6 +134,35 @@ function CheckoutContent() {
                       </span>
                     </div>
                   ))}
+
+                  {isBuyNow && (
+                    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3">
+                      <span className="text-sm font-semibold text-slate-700">
+                        Quantity
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setBuyNowQuantity(Math.max(1, buyNowQty - 1))}
+                          disabled={buyNowQty <= 1}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-white hover:text-slate-900 disabled:opacity-50"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </button>
+                        <span className="w-8 text-center text-sm font-bold text-slate-900">
+                          {buyNowQty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setBuyNowQuantity(Math.min(Number(buyNowProduct?.stock || 1), buyNowQty + 1))}
+                          disabled={buyNowQty >= Number(buyNowProduct?.stock || 1)}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-white hover:text-slate-900 disabled:opacity-50"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-6 space-y-2 border-t border-slate-200 pt-4 text-sm">
@@ -167,6 +215,8 @@ function CheckoutContent() {
           <PaymentForm
             onSuccess={handlePaymentSuccess}
             onBack={() => setStep(1)}
+            items={checkoutItems}
+            total={grandTotal}
           />
         </div>
       </main>

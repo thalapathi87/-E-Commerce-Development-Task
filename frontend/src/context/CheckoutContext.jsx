@@ -25,6 +25,8 @@ export function CheckoutProvider({ children }) {
 
   const [createdOrder, setCreatedOrder] = useState(null);
 
+  const [buyNowProduct, setBuyNowProduct] = useState(null);
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(checkoutData));
@@ -45,6 +47,7 @@ export function CheckoutProvider({ children }) {
     localStorage.removeItem(STORAGE_KEY);
     setCheckoutData({ address: null, paymentMethod: "COD" });
     setCreatedOrder(null);
+    setBuyNowProduct(null);
   };
 
   const value = {
@@ -55,6 +58,8 @@ export function CheckoutProvider({ children }) {
     createdOrder,
     setCreatedOrder,
     clearCheckoutData,
+    buyNowProduct,
+    setBuyNowProduct,
   };
 
   return (

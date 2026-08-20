@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import formatCurrency from "../../utils/formatCurrency";
 
-function OrderSummary({ cart, subtotal, shipping, grandTotal }) {
+function OrderSummary({ cart, subtotal, shipping, grandTotal, isBuyNow }) {
   return (
     <aside className="space-y-4">
       <h3 className="text-center text-sm font-semibold uppercase tracking-widest text-slate-400">
@@ -50,12 +50,14 @@ function OrderSummary({ cart, subtotal, shipping, grandTotal }) {
       </div>
 
       <div className="text-center">
-        <Link
-          to="/cart"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-        >
-          Edit Cart
-        </Link>
+        {!isBuyNow && (
+          <Link
+            to="/cart"
+            className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+          >
+            Edit Cart
+          </Link>
+        )}
       </div>
     </aside>
   );

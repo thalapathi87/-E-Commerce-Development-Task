@@ -13,57 +13,97 @@ const createOrder = async (req, res) => {
             city,
             state,
             pincode,
-            paymentMethod = "COD"
+            paymentMethod = "COD",
+            items
         } = req.body;
 
-        // Get user's cart
-        const cart = await Cart.findOne({
-            user: req.user.userId
-        }).populate("items.product");
-
-        if (!cart || cart.items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Cart is empty"
-            });
-        }
-
-        // Calculate total
+        let orderItems = [];
         let totalAmount = 0;
 
-        const orderItems = [];
+        if (items && Array.isArray(items) && items.length > 0) {
+            for (const item of items) {
+                const { productId, quantity = 1 } = item;
 
-        for (const item of cart.items) {
-            const product = item.product;
+                let product;
 
-            if (!product) {
+                try {
+                    product = await Product.findById(productId);
+                } catch (error) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid product ID"
+                    });
+                }
+
+                if (!product) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Product not found"
+                    });
+                }
+
+                if (product.stock < quantity) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Insufficient stock for ${product.name}`
+                    });
+                }
+
+                const subtotal = product.price * quantity;
+
+                totalAmount += subtotal;
+
+                orderItems.push({
+                    product: product._id,
+                    name: product.name,
+                    price: product.price,
+                    quantity,
+                    image: product.image
+                });
+            }
+        } else {
+            const cart = await Cart.findOne({
+                user: req.user.userId
+            }).populate("items.product");
+
+            if (!cart || cart.items.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "Product not found"
+                    message: "Cart is empty"
                 });
             }
 
-            if (product.stock < item.quantity) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Insufficient stock for ${product.name}`
+            for (const item of cart.items) {
+                const product = item.product;
+
+                if (!product) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Product not found"
+                    });
+                }
+
+                if (product.stock < item.quantity) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Insufficient stock for ${product.name}`
+                    });
+                }
+
+                const subtotal = product.price * item.quantity;
+
+                totalAmount += subtotal;
+
+                orderItems.push({
+                    product: product._id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: item.quantity,
+                    image: product.image
                 });
             }
-
-            const subtotal = product.price * item.quantity;
-
-            totalAmount += subtotal;
-
-            orderItems.push({
-                product: product._id,
-                name: product.name,
-                price: product.price,
-                quantity: item.quantity,
-                image: product.image
-            });
         }
 
-        // Create order
         const order = await Order.create({
             user: req.user.userId,
 
@@ -94,21 +134,38 @@ const createOrder = async (req, res) => {
             orderStatus: "Pending"
         });
 
-        // Reduce product stock
-        for (const item of cart.items) {
-            await Product.findByIdAndUpdate(
-                item.product._id,
-                {
-                    $inc: {
-                        stock: -item.quantity
+        if (items && Array.isArray(items) && items.length > 0) {
+            for (const item of orderItems) {
+                await Product.findByIdAndUpdate(
+                    item.product,
+                    {
+                        $inc: {
+                            stock: -item.quantity
+                        }
                     }
-                }
-            );
-        }
+                );
+            }
+        } else {
+            const cart = await Cart.findOne({
+                user: req.user.userId
+            });
 
-        // Clear cart
-        cart.items = [];
-        await cart.save();
+            if (cart) {
+                for (const item of cart.items) {
+                    await Product.findByIdAndUpdate(
+                        item.product._id || item.product,
+                        {
+                            $inc: {
+                                stock: -item.quantity
+                            }
+                        }
+                    );
+                }
+
+                cart.items = [];
+                await cart.save();
+            }
+        }
 
         res.status(201).json({
             success: true,

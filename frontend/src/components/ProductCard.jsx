@@ -1,6 +1,6 @@
 import { memo, useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { ShoppingBag, Eye, Clock, CheckCircle2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ShoppingBag, Eye, Clock, CheckCircle2, Zap } from "lucide-react";
 import useCart from "../hooks/useCart";
 import { useAddToCartAnimation } from "./AddToCartAnimation";
 import formatCurrency from "../utils/formatCurrency";
@@ -8,6 +8,7 @@ import formatCurrency from "../utils/formatCurrency";
 const ProductCard = memo(({ product }) => {
   const { addToCart } = useCart();
   const { triggerAddToCartAnimation } = useAddToCartAnimation();
+  const navigate = useNavigate();
   const productImageRef = useRef(null);
   const [imgError, setImgError] = useState(false);
 
@@ -22,6 +23,23 @@ const ProductCard = memo(({ product }) => {
     if (!isOutOfStock) {
       addToCart(product);
       triggerAddToCartAnimation(product, productImageRef.current);
+    }
+  };
+
+  const handleBuyNow = (e) => {
+    e.preventDefault();
+    if (!isOutOfStock) {
+      navigate("/checkout", {
+        state: {
+          buyNowProduct: {
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            stock: product.stock,
+          },
+        },
+      });
     }
   };
 
@@ -125,6 +143,16 @@ const ProductCard = memo(({ product }) => {
           >
             <ShoppingBag className="h-4 w-4 transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
             <span>{isOutOfStock ? "Sold Out" : "Add to Cart"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            className="group/btn flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white shadow-md shadow-blue-600/10 transition-all duration-300 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 active:scale-[0.98] disabled:pointer-events-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+          >
+            <Zap className="h-4 w-4 transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
+            <span>Buy Now</span>
           </button>
         </div>
       </div>
